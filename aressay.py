@@ -138,21 +138,3 @@ def encrypt(pt):
 
 def decrypt(ct):
 	return (ct ** private_key['d'] % public_key['n'])
-
-# # def encrypt_message(message):
-# # 	cyphertext = []
-# # 	for i in message:
-# # 		cyphertext.append(encrypt(ord(i)))
-# # 	return cyphertext
-
-# # def decrypt_message(cyphertext):
-# # 	decrypted_plaintext = ''
-# # 	for i in cyphertext:
-# # 		decrypted_plaintext = decrypted_plaintext + chr(decrypt(i))
-# # 	return decrypted_plaintext
-
-# user_message = input("what is your secret message?: ")
-
-# print('encrypting message ....')
-
-# cyphertext = encrypt(int(user_message))

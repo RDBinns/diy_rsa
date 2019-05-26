@@ -1,13 +1,11 @@
-public_keypair = {'e':5, 'n':14}
-private_keypair = {'d':11, 'n':14}
-
 # Key generation
 
 def isPrime(num):
-	prime = True
 	for i in range(2,num):
 		if (num % i) == 0:
 			prime = False
+		else:
+			prime = True
 	return prime
 
 def find_nearest_prime(num):
@@ -17,44 +15,44 @@ def find_nearest_prime(num):
 		else:
 			num += 1
 
-# this function tests whether two numbers are coprime - i.e. if they have any common factors other than one and themselves.
-# except it doesn't work right now! some false positives.
+# let's split the coprime function into smaller functions to simply get factors
 
-def check_coprime(num1,num2):
-	num1_factors = []
-	for i in range(3,num1):
-		if ((num1 % i) == 0):
-			num1_factors.append(i)
-	# print(num1_factors)
-	num2_factors = []
-	for i in range(3,num2):
-		if ((num2 % i) == 0):
-			num2_factors.append(i)	
-	# print(num2_factors)
+def get_factors(num):
+	factors = []
+	for i in range(2,num):
+		if ((num % i) == 0):
+			factors.append(i)
+	return factors
+
+# this function tests whether two numbers are coprime - i.e. if they have any common factors other than one and themselves.
+# seems to be working now, having separately defined the get_factors function
+
+def isCoprime(num1,num2):
+	num1_factors = get_factors(num1)
+	num2_factors = get_factors(num2)
 	if set(num1_factors).isdisjoint(set(num2_factors)):
 		# print('no common factors - they coprime!')
-		are_coprime = True
+		return True
 	else:
 		# print('there are common factors, not coprime')
-		are_coprime = False
-	return are_coprime
+		return False
 
 # check through candidate numbers that satisfy the conditions for the private key e. 
-# Order matters! (num1 = n, num2 = Φ(N))
 
 def find_e(n,phi_n):
 	candidates = []
-	for i in range(2,n):
+	for i in range(3,n):
 		if isPrime(i):
-			if((check_coprime(i,n)) and (check_coprime(i,phi_n))):
+			if((isCoprime(i,n)) and (isCoprime(i,phi_n))):
 				candidates.append(i)
 	return candidates
 
-# find d (the secret key part 1)
+# find d (the private key part 1)
 def find_d(prime1,n):
 	for i in range(prime1,n):
-		if ((i*e) == (phi_n % 1)):
-			return d
+		if (((i*e) % phi_n) == 1):
+			print(i)
+			return i
 
 # pick two large prime numbers:
 
@@ -107,21 +105,39 @@ print("Searching for e ... please wait")
 
 e = find_e(n,phi_n)
 
+# at this point we have a long list of candidates for e. let's let the user select one by entering a random number
+
+choice_e = input("to choose a particular e, pick a random number between 1 and %s: " % len(e))
+
+e = e[int(choice_e)]
 
 # find d
 
-d_candidates = []
+d = find_d(prime1,n)
 
+# let's put those keys into a nice dictionary
 
+# Example keypair:
 
+name = input('Please enter a name for this keypair (e.g. reuben_keypair): ')
 
-# # Encryption and decryption
+public_key = {'e':e, 'n':n}
+private_key = {'d':d, 'n':n}
 
-# def encrypt(pt):
-# 	return (pt ** public_keypair['e']) % public_keypair['n']
+print("Saving key pair %s_.txt to working directory. Put it somewhere safe!" % name)
 
-# def decrypt(ct):
-# 	return (ct ** private_keypair['d'] % public_keypair['n'])
+key_file = open("%s.txt" % name, "w")
+key_file.write("%s, %s" % (public_key, private_key))
+key_file.close()
+
+# Encryption and decryption
+
+def encrypt(pt):
+	print('encrypting message ... ')
+	return (pt ** public_key['e']) % public_key['n']
+
+def decrypt(ct):
+	return (ct ** private_key['d'] % public_key['n'])
 
 # # def encrypt_message(message):
 # # 	cyphertext = []
@@ -140,4 +156,3 @@ d_candidates = []
 # print('encrypting message ....')
 
 # cyphertext = encrypt(int(user_message))
-

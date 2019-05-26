@@ -18,9 +18,9 @@ def find_nearest_prime(num):
 			num += 1
 
 # this function tests whether two numbers are coprime - i.e. if they have any common factors other than one and themselves.
+# except it doesn't work right now! some false positives.
 
 def check_coprime(num1,num2):
-	are_coprime = False
 	num1_factors = []
 	for i in range(3,num1):
 		if ((num1 % i) == 0):
